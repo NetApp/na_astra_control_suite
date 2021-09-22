@@ -1,0 +1,12 @@
+ansible:
+  - playbook: playbook.yml
+#    tags: 
+    output: acc_run.log
+#    register_status: requirements_run
+    type: run
+#  - playbook: playbook.yml
+#    tags: ontap
+#    depends: requirements_run == success
+#    output: ontap_run.log
+#    type: run
+

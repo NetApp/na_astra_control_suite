@@ -1,0 +1,13 @@
+- name: Create secret with docker creds
+  kubernetes.core.k8s:
+    state: present
+    resource_definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: "{{ astra_registry_secret_name }}"
+        namespace: "{{ astra_namespace }}"
+      type: kubernetes.io/dockercfg
+      data:
+        .dockercfg: "{{ dockerconfig_encoded }}"
+    kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"

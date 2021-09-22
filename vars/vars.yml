@@ -1,0 +1,21 @@
+push_images: yes
+installer_directory: /root/astra-control-center/acc-automation
+astra_namespace: pcloud
+hosting_ocp_kubeconfig_path: /root/astra-control-center/ocp-vmw-kubeconfig
+astra_resources_scaler: Default
+storageclass_reclaim_policy: Retain
+astra_trident_storageclass: ocp-trident
+astra_tar_ball_name: astra-control-center-21.08.65
+#    astra_registry_name: astra-registry-cc.apps.ocp-vmware2.cie.netapp.com
+astra_registry_name: "docker.io"
+astra_registry_username: "niksleo415"
+astra_registry_password: "nikis475#"
+astra_registry_namespace: "niksleo415"
+astra_registry_secret_name: "astra-registry-cred"
+require_reg_creds: yes
+acc_fqdn_address: abc.netapp.com
+acc_account_name: example
+admin_email_address: test@test.com
+admin_first_name: solutions
+admin_last_name: admin
+

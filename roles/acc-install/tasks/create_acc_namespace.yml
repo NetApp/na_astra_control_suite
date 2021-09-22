@@ -1,0 +1,7 @@
+- name: Create ACC Operator namespace
+  kubernetes.core.k8s:
+    name: "{{ astra_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"

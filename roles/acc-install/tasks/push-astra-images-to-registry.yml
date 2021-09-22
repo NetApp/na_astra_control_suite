@@ -1,0 +1,74 @@
+- block:
+    - name: Grab the list of images
+      find:
+        paths: "{{ installer_directory }}/{{ astra_tar_ball_name }}/images"
+        patterns: '*.tar'
+      register: astra_images_reg
+    - name: Set the list of images
+      set_fact:  
+        astra_image_files: "{{ astra_images_reg.files | map(attribute='path') | list | map('basename') }}"
+    - name: Set the image names and tags
+      vars:
+        astra_image_names: []
+        astra_image_tags: []
+      set_fact:
+        astra_image_names: "{{ astra_image_names + [item | regex_replace('(?P<name>[a-z-]+)-(?P<tag>[v0-9].*).tar', '\\g<name>')] }}"
+        astra_image_tags: "{{ astra_image_tags + [item | regex_replace('(?P<name>[a-z-]+)-(?P<tag>[v0-9].*).tar', '\\g<tag>')] }}"
+      with_items: "{{ astra_image_files }}"
+    - debug: 
+        msg: "{{ item.0 }}:{{ item.1 }}"
+      with_together:
+        - "{{ astra_image_names }}"
+        - "{{ astra_image_tags }}"  
+    - name: Load Astra images to registry
+      community.docker.docker_image_load:
+        path: "{{ installer_directory }}/{{ astra_tar_ball_name }}/images/{{ item }}"
+      with_items: 
+        - "{{ astra_image_files }}"
+#    - name: Push the images
+#      community.docker.docker_image:
+#        name: "localhost/{{ item.0 }}:{{ item.1 }}"
+#        repository: "{{ astra_registry_name }}/niksleo415/{{ item.0 }}:{{ item.1 }}"
+#        source: local
+#        push: yes
+#        docker_host: docker.io:8080
+
+#        tls: yes
+    - name: Tag and push Astra images to registry
+      containers.podman.podman_image:
+        name: "{{ item.0 }}:{{ item.1 }}"
+        push: yes
+        username: "{{ astra_registry_username }}"
+        password: "{{ astra_registry_password }}"
+        pull: no
+        push_args:
+          dest: "{{ astra_registry_name }}/{{ astra_registry_namespace }}"
+        validate_certs: no
+      when: require_reg_creds|bool
+      with_together:
+        - "{{ astra_image_names }}"
+        - "{{ astra_image_tags }}"
+    - name: Tag and push Astra images to registry
+      containers.podman.podman_image:
+        name: "{{ item.0 }}:{{ item.1 }}"
+        push: yes
+        pull: no
+        push_args:
+          dest: "{{ astra_registry_name }}/{{ astra_registry_namespace }}"
+        validate_certs: no
+      when: not require_reg_creds|bool
+      with_together:
+        - "{{ astra_image_names }}"
+        - "{{ astra_image_tags }}"
+
+
+#    - name: Push the images
+#      community.docker.docker_image:
+#        name: "{{ astra_registry_name }}/pcloud/{{ item.0 }}:{{ item.1 }}"
+#        repository: "{{ astra_registry_name }}/pcloud/{{ item.0 }}:{{ item.1 }}"
+#        source: local
+#        push: yes
+#        validate_certs: no
+#      with_together:
+#        - "{{ astra_image_names }}"
+#        - "{{ astra_image_tags }}"

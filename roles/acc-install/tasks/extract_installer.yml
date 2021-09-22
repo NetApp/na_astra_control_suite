@@ -1,0 +1,9 @@
+- block:
+    - name: Get the working directory
+      command: pwd
+      register: pwd
+    - name: Extract the installer
+      unarchive: 
+        src: "{{ installer_directory }}/{{ astra_tar_ball_name }}.tar.gz"      
+        dest: "{{ installer_directory }}"
+#        dest: "../{{ pwd.stdout }}"

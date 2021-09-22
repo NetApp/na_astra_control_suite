@@ -1,0 +1,21 @@
+- block:
+    - name: Extract the installer
+      include_tasks: extract_installer.yml
+      when: push_images|bool
+    - name: Push the images to registry
+      include_tasks: push-astra-images-to-registry.yml
+      when: push_images|bool
+    - name: Create Operator namespace
+      include_tasks: create_operator_namespace.yml
+    - name: Create secret with docker creds for operator
+      include_tasks: create_docker_creds_for_operator.yml
+      when: require_reg_creds|bool
+    - name: Create ACC operator
+      include_tasks: create_operator.yml
+    - name: Create namespace for installing ACC CRs
+      include_tasks: create_acc_namespace.yml
+    - name: Create secret with docker creds for ACC CRs
+      include_tasks: create_docker_creds_for_acc.yml
+      when: require_reg_creds|bool
+    - name: Create ACC CRs
+      include_tasks: create_acc_crs.yml

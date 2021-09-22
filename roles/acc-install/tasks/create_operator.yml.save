@@ -1,0 +1,22 @@
+- name: Copy operator yaml file to the current directory
+  copy:
+    src: "../{{ astra_tar_ball_name }}/astra_control_center_operator_deploy.yaml"
+    dest: "apply_astra_control_center_operator_deploy.yaml"
+- name: Replace astra image registry entries
+  replace:
+    path: apply_astra_control_center_operator_deploy.yaml
+    regexp: "ASTRA_IMAGE_REGISTRY"
+    replace: "{{ astra_registry_name }}/{{ astra_registry_namespace }}"
+- name: Add image registry creds to operator
+  replace:
+    path: apply_astra_control_center_operator_deploy.yaml
+    regexp: "imagePullSecrets: \\[]"
+    replace: "imagePullSecrets: [name: astra-registry-cred]"
+  when: require_reg_creds|bool
+- name: Install the operator
+  kubernetes.core.k8s:
+    state: present
+    src: apply_astra_control_center_operator_deploy.yaml
+    kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+    wait: yes
+    

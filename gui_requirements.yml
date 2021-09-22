@@ -1,0 +1,9 @@
+yum:
+  - python3
+  - conmon
+  - podman
+
+pip3:
+  - ansible
+  - ansible-runner
+  - gitpython

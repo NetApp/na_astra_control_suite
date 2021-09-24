@@ -1,6 +1,7 @@
 ---
 - name: Run requirements
   hosts: localhost
+  become: yes
   tasks:
     - name: Install required system packages
       apt: name={{ item }} state=latest update_cache=yes

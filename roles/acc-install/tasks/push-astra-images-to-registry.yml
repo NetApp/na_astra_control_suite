@@ -20,11 +20,16 @@
       with_together:
         - "{{ astra_image_names }}"
         - "{{ astra_image_tags }}"  
-    - name: Load Astra images to registry
-      community.docker.docker_image_load:
-        path: "{{ installer_directory }}/{{ astra_tar_ball_name }}/images/{{ item }}"
+    - name: Load Astra images to local enginer
+      containers.podman.podman_load:
+        input: "{{ installer_directory }}/{{ astra_tar_ball_name }}/images/{{ item }}"
       with_items: 
-        - "{{ astra_image_files }}"
+        - "{{ astra_image_files }}"  
+#    - name: Load Astra images to registry
+#      community.docker.docker_image_load:
+#        path: "{{ installer_directory }}/{{ astra_tar_ball_name }}/images/{{ item }}"
+#     with_items: 
+#        - "{{ astra_image_files }}"
 #    - name: Push the images
 #      community.docker.docker_image:
 #        name: "localhost/{{ item.0 }}:{{ item.1 }}"

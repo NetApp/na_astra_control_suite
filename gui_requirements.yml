@@ -9,4 +9,4 @@ pip3:
   - gitpython
   - openshift
   - kubernetes
-  - docker
+#  - docker

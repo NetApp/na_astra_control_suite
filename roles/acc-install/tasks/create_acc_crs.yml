@@ -55,7 +55,7 @@
   replace:
     path: apply_astra_control_center.yaml
     regexp: "astraResourcesScaler: (.*)$"
-    replace: "astraResourcesScaler: {{ astra_resources_scaler }}"
+    replace: "astraResourcesScaler: {{ astra_resources_scaler | default('Default') }}"
 - name: Install the ACC CRs
   kubernetes.core.k8s:
     state: present

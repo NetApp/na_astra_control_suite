@@ -1,6 +1,7 @@
 - name: Copy operator yaml file to the current directory
   copy:
-    src: "{{ installer_directory }}/{{ astra_tar_ball_name }}/astra_control_center.yaml"
+#    src: "{{ installer_directory }}/{{ astra_tar_ball_name }}/astra_control_center.yaml"
+    src: "templates/astra_control_center.yaml"
     dest: "apply_astra_control_center.yaml"
 - name: Replace account name for ACC
   replace:

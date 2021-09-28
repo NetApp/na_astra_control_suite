@@ -1,6 +1,7 @@
 - name: Copy operator yaml file to the current directory
   copy:
-    src: "{{ installer_directory }}/{{ astra_tar_ball_name }}/astra_control_center_operator_deploy.yaml"
+#    src: "{{ installer_directory }}/{{ astra_tar_ball_name }}/astra_control_center_operator_deploy.yaml"
+    src: "templates/astra_control_center_operator_deploy.yaml"
     dest: "apply_astra_control_center_operator_deploy.yaml"
 - name: Replace astra image registry entries
   replace:

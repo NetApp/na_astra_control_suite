@@ -1,80 +1,98 @@
-- name: Copy operator yaml file to the current directory
-  copy:
-#    src: "{{ installer_directory }}/{{ astra_tar_ball_name }}/astra_control_center.yaml"
-    src: "templates/astra_control_center.yaml"
-    dest: "apply_astra_control_center.yaml"
-- name: Replace account name for ACC
-  replace:
-    path: apply_astra_control_center.yaml
-    regexp: "accountName: (.*)$"
-    replace: "accountName: {{ acc_account_name }}"
-- name: Replace Astra Control Center address
-  replace:
-    path: apply_astra_control_center.yaml
-    regexp: "astraAddress: (.*)$"
-    replace: "astraAddress: {{ acc_fqdn_address }}"
-- name: Replace admin email address
-  replace:
-    path: apply_astra_control_center.yaml
-    regexp: "email: (.*)$"
-    replace: "email: {{ admin_email_address }}"
-- name: Replace astra admin first name
-  replace:
-    path: apply_astra_control_center.yaml
-    regexp: "firstName: (.*)$"
-    replace: "firstName: {{ admin_first_name }}"
-- name: Replace astra admin last name
-  replace:
-    path: apply_astra_control_center.yaml
-    regexp: "lastName: (.*)$"
-    replace: "lastName: {{ admin_last_name }}"
-- name: Replace astra registry name
-  lineinfile:
-    path: apply_astra_control_center.yaml
-    regexp: '^    name: (.*)$'
-    insertafter: '^  imageRegistry'
-    line: "    name: {{ astra_registry_name }}/{{ astra_registry_namespace }}"
-- name: Replace astra registry secret name
-  lineinfile:
-    path: apply_astra_control_center.yaml
-    regexp: '^    secret: (.*)$'
-    insertafter: '^  imageRegistry'
-    line: "    secret: {{ astra_registry_secret_name }}"
-  when: require_reg_creds|bool
-- name: Replace astra trident storage class name
-  replace:
-    path: apply_astra_control_center.yaml
-    regexp: "storageClass: (.*)$"
-    replace: "storageClass: {{ astra_trident_storageclass }}"
-- name: Replace astra trident storageclass reclaim policy
-  replace:
-    path: apply_astra_control_center.yaml
-    regexp: "volumeReclaimPolicy: (.*)$"
-    replace: "volumeReclaimPolicy: {{ volume_reclaim_policy }}"
-- name: Replace astra resource scaler
-  replace:
-    path: apply_astra_control_center.yaml
-    regexp: "astraResourcesScaler: (.*)$"
-    replace: "astraResourcesScaler: {{ astra_resources_scaler | default('Default') }}"
-- name: Install the ACC CRs
-  kubernetes.core.k8s:
-    state: present
-    namespace: "{{ astra_namespace }}"
-    src: apply_astra_control_center.yaml
-    kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
-- name: Wait for 2 mins before checking the state of the deployment
-  pause:
-    minutes: 2
-- name: Wait for operator
-  kubernetes.core.k8s_info:
-    kind: Deployment
-    namespace: "{{ astra_namespace }}"
-    name: traefik
-    wait: yes
-    wait_condition:
-      type: Available
-      status: 'True'
-      reason: MinimumReplicasAvailable
-    wait_timeout: 900
-    wait_sleep: 60
-    kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+- block:
+  - name: Copy ACC yaml file to the current directory
+    copy:
+      src: "{{ installer_directory }}/{{ astra_tar_ball_name }}/astra_control_center_min.yaml"
+      dest: "apply_astra_control_center.yaml"
+  - name: Replace account name for ACC
+    replace:
+      path: apply_astra_control_center.yaml
+      regexp: "accountName: (.*)$"
+      replace: "accountName: {{ acc_account_name }}"
+  - name: Replace Astra Control Center address
+    replace:
+      path: apply_astra_control_center.yaml
+      regexp: "astraAddress: (.*)$"
+      replace: "astraAddress: {{ acc_fqdn_address }}"
+  - name: Replace admin email address
+    replace:
+      path: apply_astra_control_center.yaml
+      regexp: "email: (.*)$"
+      replace: "email: {{ admin_email_address }}"
+  - name: Replace astra admin first name
+    replace:
+      path: apply_astra_control_center.yaml
+      regexp: "firstName: (.*)$"
+      replace: "firstName: {{ admin_first_name }}"
+  - name: Replace astra admin last name
+    replace:
+      path: apply_astra_control_center.yaml
+      regexp: "lastName: (.*)$"
+      replace: "lastName: {{ admin_last_name }}"
+  - name: Replace astra registry name
+    lineinfile:
+      path: apply_astra_control_center.yaml
+      regexp: '^    name: (.*)$'
+      insertafter: '^  imageRegistry'
+      line: "    name: {{ astra_registry_name }}/{{ astra_registry_namespace }}"
+  - name: Replace astra registry secret name
+    lineinfile:
+      path: apply_astra_control_center.yaml
+      regexp: '^    secret: (.*)$'
+      insertafter: '^  imageRegistry'
+      line: "    secret: {{ astra_registry_secret_name }}"
+    when: require_reg_creds|bool
+  - name: Replace astra trident storage class name
+    lineinfile:
+      path: apply_astra_control_center.yaml
+      regexp: '^  storageClass: (.*)$'
+      insertafter: EOF
+      line: "  storageClass: {{ astra_trident_storageclass }}"
+    when: (astra_trident_storageclass is defined) and (astra_trident_storageclass|length > 0)
+  - name: Replace astra trident storageclass reclaim policy
+    lineinfile:
+      path: apply_astra_control_center.yaml
+      regexp: '^  volumeReclaimPolicy: (.*)$'
+      insertafter: EOF
+      line: "  volumeReclaimPolicy: {{ storageclass_reclaim_policy }}"
+    when: (storageclass_reclaim_policy is defined) and (storageclass_reclaim_policy|length > 0)
+  - name: Replace astra resource scaler
+    lineinfile:
+      path: apply_astra_control_center.yaml
+      regexp: '^  astraResourcesScaler: (.*)$'
+      insertafter: EOF
+      line: "  astraResourcesScaler: {{ astra_resources_scaler | default('Default') }}"
+    when: (astra_resources_scaler is defined) and (astra_resources_scaler|length > 0)
+  - name: Install the ACC CRs
+    kubernetes.core.k8s:
+      state: present
+      namespace: "{{ astra_namespace }}"
+      src: apply_astra_control_center.yaml
+      kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+  - name: Wait for 2 mins before checking the status of ACC deployment
+    pause:
+      minutes: 2
+  - name: Wait for Astra Control Center to be Ready
+    kubernetes.core.k8s_info:
+      api_version: astra.netapp.io/v1
+      kind: AstraControlCenter
+      namespace: "{{ astra_namespace }}"
+      name: astra
+      wait: yes
+      wait_condition:
+        type: Ready
+        status: "True"
+        reason: Complete
+      wait_timeout: 1000
+      wait_sleep: 30
+      kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+  rescue:
+    - name: Failure
+      fail:
+        msg:
+        - Installation of Astra Control Center failed.
+        - Possible troubleshooting steps - 
+        - 1. Check if the kubeconfig is correct and the cluster is reachable
+        - 2. Check if the Astra Control Center installer tar ball is accessible
+        - 3. Check if Astra Trident is installed with backend and storageclass configured.
+        - 4. Ensure there are no resources remaining from previous failed installs.
+        - 5. Check if variables defined adhere to the guidelines and are correct.

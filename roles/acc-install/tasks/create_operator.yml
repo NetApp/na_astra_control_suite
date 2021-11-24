@@ -1,33 +1,44 @@
-- name: Copy operator yaml file to the current directory
-  copy:
-#    src: "{{ installer_directory }}/{{ astra_tar_ball_name }}/astra_control_center_operator_deploy.yaml"
-    src: "templates/astra_control_center_operator_deploy.yaml"
-    dest: "apply_astra_control_center_operator_deploy.yaml"
-- name: Replace astra image registry entries
-  replace:
-    path: apply_astra_control_center_operator_deploy.yaml
-    regexp: "ASTRA_IMAGE_REGISTRY"
-    replace: "{{ astra_registry_name }}/{{ astra_registry_namespace }}"
-- name: Add image registry creds to operator
-  replace:
-    path: apply_astra_control_center_operator_deploy.yaml
-    regexp: "imagePullSecrets: \\[]"
-    replace: "imagePullSecrets: [name: astra-registry-cred]"
-  when: require_reg_creds|bool
-- name: Install the operator
-  kubernetes.core.k8s:
-    state: present
-    src: apply_astra_control_center_operator_deploy.yaml
-    kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
-- name: Wait for operator 
-  kubernetes.core.k8s_info:
-    kind: Deployment
-    namespace: netapp-acc-operator
-    name: acc-operator-controller-manager
-    wait: yes
-    wait_condition:
-      type: Available
-      status: 'True'
-    wait_timeout: 120
-    wait_sleep: 2
-    kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+- block:
+  - name: Copy operator yaml file to the current directory
+    copy:
+      src: "{{ installer_directory }}/{{ astra_tar_ball_name }}/astra_control_center_operator_deploy.yaml"
+      dest: "apply_astra_control_center_operator_deploy.yaml"
+  - name: Replace astra image registry entries
+    replace:
+      path: apply_astra_control_center_operator_deploy.yaml
+      regexp: "ASTRA_IMAGE_REGISTRY"
+      replace: "{{ astra_registry_name }}/{{ astra_registry_namespace }}"
+  - name: Add image registry creds to operator
+    replace:
+      path: apply_astra_control_center_operator_deploy.yaml
+      regexp: "imagePullSecrets: \\[]"
+      replace: "imagePullSecrets: [name: {{ astra_registry_secret_name }}]"
+    when: require_reg_creds|bool
+  - name: Install the operator
+    kubernetes.core.k8s:
+      state: present
+      src: apply_astra_control_center_operator_deploy.yaml
+      kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+  - name: Wait for operator 
+    kubernetes.core.k8s_info:
+      kind: Deployment
+      namespace: netapp-acc-operator
+      name: acc-operator-controller-manager
+      wait: yes
+      wait_condition:
+        type: Available
+        status: 'True'
+      wait_timeout: 120
+      wait_sleep: 2
+      kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+  rescue:
+    - name: Failure
+      fail:
+        msg:
+        - Installation of Astra Control Center Operator failed.
+        - Possible troubleshooting steps - 
+        - 1. Check if the kubeconfig is correct and the cluster is reachable
+        - 2. Check if the Astra Control Center installer tar ball is accessible
+        - 3. Check if Astra Trident is installed with backend and storageclass configured.
+        - 4. Ensure there are no resources remaining from previous failed installs.
+        - 5. Check if variables defined adhere to the guidelines and are correct.

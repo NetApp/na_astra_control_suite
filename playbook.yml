@@ -1,24 +1,21 @@
 ---
-#- name: Run requirements
-#  hosts: localhost
-#  become: yes
-#  tasks:
-#    - name: Install required system packages
-#      apt: name={{ item }} state=latest update_cache=yes
-#      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
-#
-#    - name: Add Docker GPG apt Key
-#      apt_key:
-#        url: https://download.docker.com/linux/ubuntu/gpg
-#        state: present
-#
-#    - name: Add Docker Repository
-#      apt_repository:
-#        repo: deb https://download.docker.com/linux/ubuntu bionic stable
-#        state: present
-#
-#    - name: Update apt and install docker-ce
-#      apt: update_cache=yes name=docker-ce state=latest
+- name: Install dependencies 
+  hosts: localhost
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Install conmon and podman 
+      yum:
+        name:
+          - conmon
+          - podman
+        state: present
+    - name: Install Kubernetes python libraries
+      pip:
+        name:
+          - kubernetes
+  tags:
+    - install_requirements
 
 - name: Install collection requirements
   hosts: localhost
@@ -33,6 +30,7 @@
 - name: Run playbook
   hosts: localhost
   become: yes
+  gather_facts: false
   vars_files:
     - vars/vars.yml
   roles:

@@ -1,7 +1,6 @@
 - block:
     - name: Extract the installer
       include_tasks: extract_installer.yml
-      when: push_images|bool
     - name: Push the images to registry
       include_tasks: push-astra-images-to-registry.yml
       when: push_images|bool

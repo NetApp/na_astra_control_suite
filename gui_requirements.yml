@@ -5,8 +5,4 @@ yum:
 
 pip3:
   - ansible
-  - ansible-runner
-  - gitpython
-  - openshift
   - kubernetes
-#  - docker

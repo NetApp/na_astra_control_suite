@@ -1,36 +1,47 @@
-- name: Create string of username & password
-  set_fact:
-    userpass: "{{ astra_registry_username }}:{{ astra_registry_password }}" 
-- debug: var=userpass
-- name: Create a base64 encoded string of username and password
-  set_fact:
-    reg_auth: "{{ userpass | b64encode }}"
-- debug: var=reg_auth
-- vars:
-    vardockerconfig:
-      "auths":
-        "{{ astra_registry_name }}":
-          "username": "{{ astra_registry_username }}"
-          "password": "{{ astra_registry_password }}"
-          "auth": "{{ reg_auth }}"
-  name: Create the docker config
-  set_fact:
-    dockerconfig: "{{ vardockerconfig | to_json }}"
--  debug: msg="{{ dockerconfig }}"
-- name: Create the docker config
-  set_fact:
-    dockerconfig_encoded: "{{ dockerconfig | regex_replace(\"'\", '\"') | replace(\" \", \"\") | b64encode }}"
-- debug: var=dockerconfig_encoded
-- name: Create secret with docker creds
-  kubernetes.core.k8s:
-    state: present
-    resource_definition:
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: "{{ astra_registry_secret_name }}"
-        namespace: netapp-acc-operator
-      type: kubernetes.io/dockercfg
-      data:
-        .dockercfg: "{{ dockerconfig_encoded }}"
-    kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+- block:
+  - name: Create string of username & password
+    set_fact:
+      userpass: "{{ astra_registry_username }}:{{ astra_registry_password }}" 
+  - debug: var=userpass
+  - name: Create a base64 encoded string of username and password
+    set_fact:
+      reg_auth: "{{ userpass | b64encode }}"
+  - debug: var=reg_auth
+  - vars:
+      vardockerconfig:
+        "auths":
+          "{{ astra_registry_name }}":
+            "username": "{{ astra_registry_username }}"
+            "password": "{{ astra_registry_password }}"
+            "auth": "{{ reg_auth }}"
+    name: Create the docker config
+    set_fact:
+      dockerconfig: "{{ vardockerconfig | to_json }}"
+  -  debug: msg="{{ dockerconfig }}"
+  - name: Create the docker config
+    set_fact:
+      dockerconfig_encoded: "{{ dockerconfig | regex_replace(\"'\", '\"') | replace(\" \", \"\") | b64encode }}"
+  - debug: var=dockerconfig_encoded
+  - name: Create secret with docker creds
+    kubernetes.core.k8s:
+      state: present
+      resource_definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: "{{ astra_registry_secret_name }}"
+          namespace: netapp-acc-operator
+        type: kubernetes.io/dockerconfigjson
+        data:
+          .dockerconfigjson: "{{ dockerconfig_encoded }}"
+      kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+  rescue:
+    - name: Failure
+      fail:
+        msg:
+        - Creation of secret for registry credentials failed.
+        - Possible troubleshooting steps - 
+        - 1. Check if the kubeconfig is correct and the cluster is reachable
+        - 2. Ensure there are no resources remaining from previous failed installs.
+        - 3. Check if variables defined adhere to the guidelines and are correct.
+

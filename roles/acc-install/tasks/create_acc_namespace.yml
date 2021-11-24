@@ -1,7 +1,18 @@
-- name: Create ACC Operator namespace
-  kubernetes.core.k8s:
-    name: "{{ astra_namespace }}"
-    api_version: v1
-    kind: Namespace
-    state: present
-    kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+- block:
+  - name: Create ACC Operator namespace
+    kubernetes.core.k8s:
+      name: "{{ astra_namespace }}"
+      api_version: v1
+      kind: Namespace
+      state: present
+      kubeconfig: "{{ hosting_ocp_kubeconfig_path }}"
+  rescue:
+    - name: Failure
+      fail:
+        msg:
+        - Creation of Astra Control Center namespace failed.
+        - Possible troubleshooting steps -
+        - 1. Check if the kubeconfig is correct and the cluster is reachable
+        - 2. Ensure there are no resources remaining from previous failed installs.
+        - 3. Check if variables defined adhere to the guidelines and are correct.
+

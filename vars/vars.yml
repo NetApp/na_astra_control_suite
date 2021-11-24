@@ -1,21 +1,48 @@
-push_images: yes
-installer_directory: /root/astra-control-center/acc-automation
-astra_namespace: pcloud
-hosting_ocp_kubeconfig_path: /root/astra-control-center/ocp-vmw-kubeconfig
+#Define whether or not to push the Astra Control Center images to your private registry
+push_images: no
+
+#The directory hosting the Astra Control Center installer
+installer_directory: /root/astra-control-center/
+
+#Name of the Astra Control Center installer (Do not include the extension, just the name)
+astra_tar_ball_name: astra-control-center-21.12.5
+
+#The complete path to the kubeconfig file of the kubernetes/openshift cluster Astra Control Center needs to be installed to.
+hosting_ocp_kubeconfig_path: /root/astra-control-center/ocp-vmware2-kubeconfig
+
+#Namespace in which Astra Control Center is to be installed
+astra_namespace: netapp-astra-cc
+
+#Astra Control Center Resources Scaler. Leave it blank if you want to accept the Default setting.
 astra_resources_scaler: Default
-storageclass_reclaim_policy: Retain
+
+#Storageclass to be used for Astra Control Center PVCs [Leave it blank if you want the PVCs to use default storageclass]
 astra_trident_storageclass: ocp-trident
-astra_tar_ball_name: astra-control-center-21.08.65
-#    astra_registry_name: astra-registry-cc.apps.ocp-vmware2.cie.netapp.com
+
+#Reclaim Policy for Astra Control Center Persistent Volumes [Allowed values: Retain, Delete]
+storageclass_reclaim_policy: Retain
+
+#Private Registry Details
 astra_registry_name: "docker.io"
+astra_registry_namespace: "niksleo415"
+
+#Whether the private registry requires credentials
+require_reg_creds: yes
+
+#If require_reg_creds is yes, then define the private registry credentials
 astra_registry_username: "niksleo415"
 astra_registry_password: "nikis475#"
-astra_registry_namespace: "niksleo415"
-astra_registry_secret_name: "astra-registry-cred"
-require_reg_creds: yes
-acc_fqdn_address: abc.netapp.com
-acc_account_name: example
-admin_email_address: test@test.com
-admin_first_name: solutions
-admin_last_name: admin
 
+#Kuberenets/OpenShift secret name for Astra Control Center
+astra_registry_secret_name: "astra-registry-credentials"
+
+#Astra Control Center FQDN
+acc_fqdn_address: astra-control-center-ui.cie.netapp.com
+
+#Name of the Astra Control Center instance
+acc_account_name: HCG Solutions 
+
+#Administrator details for Astra Control Center
+admin_email_address: nikhil.kulkarni@netapp.com
+admin_first_name: Nikhil
+admin_last_name: Kulkarni

@@ -1,11 +1,13 @@
 ansible:
   - playbook: playbook.yml
-#    tags: 
+#    include_tags: 
+#    skip_tags:
     output: acc_run.log
 #    register_status: requirements_run
     type: run
 #  - playbook: playbook.yml
-#    tags: ontap
+#    include_tags: 
+#    skip_tags:
 #    depends: requirements_run == success
 #    output: ontap_run.log
 #    type: run

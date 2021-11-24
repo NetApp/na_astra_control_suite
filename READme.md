@@ -13,17 +13,17 @@ Note that there are certain restrictions around producing and/or sharing any der
 Pre-requisites
 ------------
 
-    1. Ansible with version 2.9 and above.
-    2. Kubernetes (v1.19+)/OpenShift platform (v4.6+) installed [atleast 3 worker nodes with 8 CPUs, 16GB memory and 50GB storage].
-    3. NetApp Astra Trident installed on the Kubernetes/OpenShift cluster with appropriate backend and storageclass configured.
-    4. A loadbalancer configured on the Kubernetes/OpenShift cluster for exposing loadbalancer services.
-    5. A private registry with read/write access.
+1. Ansible with version 2.9 and above.
+2. Kubernetes (v1.19+)/OpenShift platform (v4.6+) installed [atleast 3 worker nodes with 8 CPUs, 16GB memory and 50GB storage].
+3. NetApp Astra Trident installed on the Kubernetes/OpenShift cluster with appropriate backend and storageclass configured.
+4. A loadbalancer configured on the Kubernetes/OpenShift cluster for exposing loadbalancer services.
+5. A private registry with read/write access.
 
 Requirements
 -----------
 
-    1. Download the Astra Control Center installer tarball from NetApp Support Site [here](https://mysupport.netapp.com/site/products/all/details/astra-control-center/downloads-tab).
-    2. A kubeconfig file with admin access of the Kubernetes/OpenShift cluster on which Astra Control Center is planned to be installed on.
+1. Download the Astra Control Center installer tarball from NetApp Support Site [here](https://mysupport.netapp.com/site/products/all/details/astra-control-center/downloads-tab).
+2. A kubeconfig file with admin access of the Kubernetes/OpenShift cluster on which Astra Control Center is planned to be installed on.
 
 
 Variables
@@ -40,9 +40,11 @@ Procedure
 2. The playbook requires root privileges to complete some configuration.
 
 3. Run the playbook with the following command if the user is root or the user has passwordless sudo configured - 
+    
     ansible-playbook playbook.yml
 
 4. Run the playbook with the following command if the user has password based privileged root access configured and then pass the sudo password - 
+    
     ansible-playbook playbook.yml -K
 
 
@@ -50,4 +52,5 @@ Author Information
 ------------------
 
 - [Nikhil M Kulkarni](nikhil.kulkarni@netapp.com) - NetApp Solutions Automation Team
+
 

@@ -16,7 +16,7 @@ astra_namespace: netapp-astra-cc
 #Astra Control Center Resources Scaler. Leave it blank if you want to accept the Default setting.
 astra_resources_scaler: Default
 
-#Storageclass to be used for Astra Control Center PVCs [Leave it blank if you want the PVCs to use default storageclass]
+#Storageclass to be used for Astra Control Center PVCs, it must be created before running the playbook [Leave it blank if you want the PVCs to use default storageclass]
 astra_trident_storageclass: basic
 
 #Reclaim Policy for Astra Control Center Persistent Volumes [Allowed values: Retain, Delete]
@@ -24,16 +24,18 @@ storageclass_reclaim_policy: Retain
 
 #Private Registry Details
 astra_registry_name: "docker.io"
-astra_registry_namespace: "registry-user"
 
 #Whether the private registry requires credentials [Allowed values: yes, no]
 require_reg_creds: yes
 
-#If require_reg_creds is yes, then define the private registry credentials
+#If require_reg_creds is yes, then define the container image registry credentials
+#Usually, the registry namespace and usernames are same for individual users
+astra_registry_namespace: "registry-user"
 astra_registry_username: "registry-user"
 astra_registry_password: "password"
 
 #Kuberenets/OpenShift secret name for Astra Control Center
+#This name will be assigned to the K8s secret created by the playbook
 astra_registry_secret_name: "astra-registry-credentials"
 
 #Astra Control Center FQDN

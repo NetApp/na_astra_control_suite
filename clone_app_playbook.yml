@@ -1,0 +1,7 @@
+- name: Run playbook
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/clone_vars.yml
+  roles:
+    - role: clone_app

@@ -1,0 +1,169 @@
+- name: Fetch the astra control cloud details
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/topology/v1/clouds/"
+    method: GET
+    return_content: yes
+    validate_certs: no
+    headers:
+      accept: "application/json"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+  register: ac_cloud
+- debug: msg="{{ ac_cloud.json.keys() }}"
+- debug: msg="{{ item.id }}"
+  with_items: "{{ ac_cloud.json.values() }}"
+  when: item.id is defined
+- vars:
+    cloud_id_details: []
+  set_fact:
+    cloud_id_details: "{{ cloud_id_details + [item.id] }}"
+  with_items: "{{ ac_cloud.json.values() }}"
+  when: item.id is defined
+
+
+- name: Fetch the astra control cluster details
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/topology/v1/clouds/{{ item }}/clusters"
+    method: GET
+    return_content: true
+    validate_certs: false
+    headers:
+      accept: "application/json"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+  register: ac_clusters
+  with_items: "{{ cloud_id_details }}"
+- vars:
+    cluster_id_details: []
+    cluster_loop_var:
+      name: "{{ item.1.name }}"
+      id: "{{ item.1.id }}"
+  set_fact:
+    cluster_id_details: "{{ cluster_id_details + [cluster_loop_var] }}"
+  with_subelements:
+    - "{{ ac_clusters.results }}"
+    - json.items
+- debug: var=cluster_id_details
+- set_fact:
+    src_cluster_id: "{{ item.id }}"
+  with_items: "{{ cluster_id_details }}"
+  when: item.name == src_cluster_name
+- set_fact:
+    dest_cluster_id: "{{ item.id }}"
+  with_items: "{{ cluster_id_details }}"
+  when: item.name == dest_cluster_name
+
+- name: Fetch the astra control managed apps details
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/k8s/v1/managedApps"
+    method: GET
+    return_content: true
+    validate_certs: false
+    headers:
+      accept: "application/json"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+  register: ac_managed_apps
+  
+- vars:
+    managed_apps_details: []
+    managed_apps_var:
+      name: "{{ item.name }}"
+      id: "{{ item.id }}"
+      namespace: "{{item.namespace }}"
+  set_fact:
+    managed_apps_details: "{{ managed_apps_details + [managed_apps_var] }}"
+  with_items: "{{ ac_managed_apps.json.values() }}"
+  when: item.name is defined
+- debug: var=managed_apps_details
+- set_fact:
+    src_app_id: "{{ item.id }}"
+  with_items: "{{ managed_apps_details }}"
+  when: item.name is defined and item.name == src_app_name 
+- set_fact:
+    src_app_for_clone_id: "{{ src_app_id }}"
+  when: src_app_id is defined and '"__omit_place_holder__" in src_backup_name' and '"__omit_place_holder__" in src_snap_name'
+
+- name: Fetch the astra control app backup details
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/k8s/v1/managedApps/{{ src_app_id }}/appBackups"
+    method: GET
+    return_content: true
+    validate_certs: false
+    headers:
+      accept: "application/json"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+  register: ac_app_backups
+  when: src_backup_name is defined
+- debug: var=item.id
+  with_items: "{{ ac_app_backups.json.values() }}"
+  when: item.id is defined
+- set_fact:
+    src_backup_id: "{{ item.id }}"
+  with_items: "{{ ac_app_backups.json.values() }}"
+  when: item.name is defined and src_backup_name is defined and src_backup_name != 'None' and '"__omit_place_holder__" not in src_backup_name' and item.name == src_backup_name 
+
+- name: Fetch the astra control app snapshot details
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/k8s/v1/managedApps/{{ src_app_id }}/appSnaps"
+    method: GET
+    return_content: true
+    validate_certs: false
+    headers:
+      accept: "application/json"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+  register: ac_app_snaps
+  when: src_snap_name is defined
+- debug: var=item.id
+  with_items: "{{ ac_app_snaps.json.values() }}"
+  when: item.id is defined
+- set_fact:
+    src_snap_id: "{{ item.id }}"
+  with_items: "{{ ac_app_snaps.json.values() }}"
+  when: item.name is defined and src_snap_name is defined and src_snap_name != 'None' and item.name == src_snap_name and '"__omit_place_holder__" not in src_snap_name'
+
+- debug: var=src_app_for_clone_id
+- debug: var=src_app_id
+- debug: var=src_backup_name
+- debug: var=src_snap_name
+
+- name: Create a clone of the ManagedApp in Astra Control
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/k8s/v1/managedApps"
+    method: POST
+#    return_content: yes
+    validate_certs: false
+    headers:
+      accept: "*/*"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+    status_code: 201
+    body_format: json
+    body:
+      type: "application/astra-managedApp"
+      version: "1.2"
+      name: "{{ dest_clone_name }}"
+      clusterID: "{{ dest_cluster_id }}"
+      sourceClusterID: "{{ src_cluster_id }}"
+      namespace: "{{ dest_namespace }}"
+      sourceAppID: "{{ src_app_for_clone_id | default(omit) }}"
+      snapshotID: "{{ src_snap_id | default(omit) }}"
+      backupID: "{{ src_backup_id | default(omit) }}"
+  register: clone_app_register  
+- debug: var=clone_app_register
+- debug: var=clone_app_register.json.id
+- set_fact: 
+    cloned_app_id: "{{ clone_app_register.json.id }}"
+  when: clone_app_register.json.id is defined
+- debug: msg="{{ cloned_app_id }}"
+- name: Wait for clone to complete
+  uri: 
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/k8s/v1/managedApps/{{ cloned_app_id | replace('\"', '') }}"
+    method: GET
+#    return_content: yes
+    validate_certs: false
+    headers:
+      accept: "application/json"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+    status_code: 200
+  register: clone_status
+  until: clone_status.json.state == "running"
+  retries: 60
+  delay: 30
+- debug: var=clone_status

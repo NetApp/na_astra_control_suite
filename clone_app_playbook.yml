@@ -1,10 +1,10 @@
-#- name: Run playbook
-#  hosts: localhost
-#  gather_facts: false
-#  vars_files:
-#    - vars/clone_vars.yml
-#  roles:
-#    - role: clone_app
+- name: Run playbook
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/clone_vars.yml
+  roles:
+    - role: clone_app
 
 #The below play is specifically for a demo to utilize the clone 
 #To use the clone created in the previous play for CI/CD or brownfield upgrades
@@ -25,6 +25,8 @@
     db_root_password: password123
     kubeconfig_path: "/home/admin/kubeconfig.yml"
   tasks:
+    - ansible.builtin.command: 
+        cmd: ansible-galaxy install -r collections/requirements.yml
     - name: Download and extract helm
       ansible.builtin.unarchive:
         src: "https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz"

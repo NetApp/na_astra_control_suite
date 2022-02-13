@@ -8,3 +8,5 @@ clone_details:
     source_cluster_name: ocp-vmware2
     destination_cluster_name: ocp-vmware2    
     source_application_name: wordpress-template
+    #source_backup_name: ""  #Use when you want to clone the application based on a previous backup. Uncomment and set the name of the backup
+    #source_snapshot_name: ""  #Use when you want to clone the application bsaed on a previous snapshot. Uncomment and set the name of the snapshot

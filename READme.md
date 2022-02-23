@@ -14,6 +14,7 @@ Pre-requisites for Astra Control Center Installation
 ------------
 
 1. Ansible with version 2.9 and above.
+NOTE: The playbooks are validated on RHEL 8 & Ubuntu 20.04 machines. 
 
 2. Kubernetes (v1.19+)/OpenShift platform (v4.6+) installed [atleast 3 worker nodes with 8 CPUs, 16GB memory and 50GB storage].
 

@@ -1,0 +1,57 @@
+---
+- name: Install dependencies 
+  hosts: localhost
+  become: yes
+  gather_facts: true
+  tasks:
+    - name: Install conmon and podman 
+      yum:
+        name:
+          - conmon
+          - podman
+        state: present
+      when: hostvars[inventory_hostname].ansible_distribution == "RedHat"
+    - name: Add Kubic apt repo
+      ansible.builtin.apt_repository:
+        repo: "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_{{ hostvars[inventory_hostname].ansible_distribution_version }}/ /"
+      when: hostvars[inventory_hostname].ansible_distribution == "Ubuntu"
+    - name: add GPG key for Kubic repo
+      ansible.builtin.apt_key:
+        url: https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_{{ hostvars[inventory_hostname].ansible_distribution_version }}/Release.key
+        state: present
+      when: hostvars[inventory_hostname].ansible_distribution == "Ubuntu"
+    - name: Install conmon and podman [Ubuntu]
+      apt:
+        name:
+          - conmon
+          - podman
+        state: present
+      when: hostvars[inventory_hostname].ansible_distribution == "Ubuntu"
+    - name: Install Kubernetes python libraries
+      pip:
+        name:
+          - kubernetes
+        state: present
+  tags:
+    - install_requirements
+
+- name: Install collection requirements
+  hosts: localhost
+  become: yes
+  gather_facts: false
+  tasks:
+    - ansible.builtin.command: 
+        cmd: ansible-galaxy install -r collections/requirements.yml
+  tags: 
+    - install_requirements
+
+- name: Run playbook
+  hosts: localhost
+  become: yes
+  gather_facts: false
+  vars_files:
+    - vars/vars.yml
+  roles:
+    - role: acc-install
+  tags:
+    - install_acc

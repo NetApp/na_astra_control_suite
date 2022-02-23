@@ -1,0 +1,15 @@
+- block:
+    - name: Clone App
+      vars:
+        dest_clone_name: "{{ loop_item.clone_name }}"
+        src_cluster_name: "{{ loop_item.source_cluster_name }}"
+        dest_cluster_name: "{{ loop_item.destination_cluster_name }}"
+        src_app_name: "{{ loop_item.source_application_name }}"
+        dest_namespace: "{{ loop_item.destination_namespace }}"
+        src_backup_name: "{{ loop_item.source_backup_name | default(omit) }}"
+        src_snap_name: "{{ loop_item.source_snapshot_name | default(omit) }}"
+      include_tasks: clone_app.yml
+      with_items: "{{ clone_details }}"
+      loop_control:
+        loop_var: loop_item
+#      debug: var=src_cluster_name

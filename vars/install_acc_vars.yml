@@ -2,13 +2,13 @@
 push_images: yes
 
 #The directory hosting the Astra Control Center installer
-installer_directory: /home/admin/
+installer_directory: /home/admin1/
 
 #Name of the Astra Control Center installer (Do not include the extension, just the name)
-astra_tar_ball_name: astra-control-center-21.08.65
+astra_tar_ball_name: astra-control-center-21.12.59
 
 #The complete path to the kubeconfig file of the kubernetes/openshift cluster Astra Control Center needs to be installed to.
-hosting_ocp_kubeconfig_path: /home/admin/ocp-kubeconfig
+hosting_ocp_kubeconfig_path: /home/admin1/ocp-vmware2-kubeconfig
 
 #Namespace in which Astra Control Center is to be installed
 astra_namespace: netapp-astra-cc
@@ -17,7 +17,7 @@ astra_namespace: netapp-astra-cc
 astra_resources_scaler: Default
 
 #Storageclass to be used for Astra Control Center PVCs, it must be created before running the playbook [Leave it blank if you want the PVCs to use default storageclass]
-astra_trident_storageclass: basic
+astra_trident_storageclass: ocp-trident
 
 #Reclaim Policy for Astra Control Center Persistent Volumes [Allowed values: Retain, Delete]
 storageclass_reclaim_policy: Retain
@@ -30,9 +30,9 @@ require_reg_creds: yes
 
 #If require_reg_creds is yes, then define the container image registry credentials
 #Usually, the registry namespace and usernames are same for individual users
-astra_registry_namespace: "registry-user"
-astra_registry_username: "registry-user"
-astra_registry_password: "password"
+astra_registry_namespace: "niksleo415"
+astra_registry_username: "niksleo415"
+astra_registry_password: "nikis475#"
 
 #Kuberenets/OpenShift secret name for Astra Control Center
 #This name will be assigned to the K8s secret created by the playbook

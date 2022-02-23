@@ -1,0 +1,12 @@
+astra_control_fqdn: astra-control-center.cie.netapp.com
+astra_control_account_id: "fa9214eb-670d-41f1-bfcb-34cb3b69fda1"
+astra_control_api_token: "UMG12IddjympbtdAskrI2jYoTnbIehOdkX-3cwwr8eI="
+
+clone_details:
+  - clone_name: wordpress-team-d
+    destination_namespace: wordpress-team-d
+    source_cluster_name: ocp-vmware2
+    destination_cluster_name: ocp-vmware2    
+    source_application_name: wordpress-template
+    #source_backup_name: ""  #Use when you want to clone the application based on a previous backup. Uncomment and set the name of the backup
+    #source_snapshot_name: ""  #Use when you want to clone the application bsaed on a previous snapshot. Uncomment and set the name of the snapshot

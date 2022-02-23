@@ -14,7 +14,7 @@ Pre-requisites for Astra Control Center Installation
 ------------
 
 1. Ansible with version 2.9 and above.
-NOTE: The playbooks are validated on RHEL 8 & Ubuntu 20.04 machines. 
+`NOTE: The playbooks are validated on RHEL 8 & Ubuntu 20.04 machines`
 
 2. Kubernetes (v1.19+)/OpenShift platform (v4.6+) installed [atleast 3 worker nodes with 8 CPUs, 16GB memory and 50GB storage].
 
@@ -45,9 +45,9 @@ Procedure for Astra Control Center Installation
 
 2. The playbook requires root privileges to complete some configuration.
 
-3. Run the playbook with the following command if the user is root or the user has passwordless sudo configured - `ansible-playbook playbook.yml`
+3. Run the playbook with the following command if the user is root or the user has passwordless sudo configured - `ansible-playbook install_acc_playbook.yml`
 
-4. Run the playbook with the following command if the user has password based privileged root access configured and then pass the sudo password - `ansible-playbook playbook.yml -K`
+4. Run the playbook with the following command if the user has password based privileged root access configured and then pass the sudo password - `ansible-playbook install_acc_playbook.yml -K`
 
 
 Author Information

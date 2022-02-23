@@ -1,7 +1,7 @@
-na_deploy_astra_control_center
+na_astra_control_suite
 =========
 
-This ansible role can be used to install the NetApp Astra Control Center on Kubernetes/OpenShift platform. Astra Control Center is an application-aware data management platform from NetApp for protecting, migrating, cloning or restoring the containerized applications.
+The repository contains Ansible roles and playbooks for installation of NetApp Astra Control Center on Kubernetes/OpenShift platform and also for performing certain tasks on NetApp Astra Control (Service & Center).
 
 License
 ------
@@ -10,7 +10,7 @@ By accessing, downloading, installing or using the content in this repository, y
 
 Note that there are certain restrictions around producing and/or sharing any derivative works with the content in this repository. Please make sure you read the terms of the [License](license.txt) before using the content. If you do not agree to all of the terms, do not access, download or use the content in this repository.
 
-Pre-requisites
+Pre-requisites for Astra Control Center Installation
 ------------
 
 1. Ansible with version 2.9 and above.
@@ -23,7 +23,7 @@ Pre-requisites
 
 5. A private registry with read/write access.
 
-Requirements
+Requirements for Astra Control Center Installation
 -----------
 
 1. Download the Astra Control Center installer tarball from NetApp Support Site [here](https://mysupport.netapp.com/site/products/all/details/astra-control-center/downloads-tab).
@@ -31,16 +31,16 @@ Requirements
 2. A kubeconfig file with admin access of the Kubernetes/OpenShift cluster on which Astra Control Center is planned to be installed on.
 
 
-Variables
+Variables for Astra Control Center Installation
 ---------
 
-Refer the vars/vars.yml for information on variables.
+Refer the vars/install_acc_vars.yml for information on variables.
 
 
-Procedure
+Procedure for Astra Control Center Installation
 --------
 
-1. Edit the vars/vars.yml file and fill the variables with the information of Astra Control Center installer, cluster kubeconfig, private registry details and Astra Control Center details.
+1. Edit the vars/install_acc_vars.yml file and fill the variables with the information of Astra Control Center installer, cluster kubeconfig, private registry details and Astra Control Center details.
 
 2. The playbook requires root privileges to complete some configuration.
 

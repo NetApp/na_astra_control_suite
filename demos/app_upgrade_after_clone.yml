@@ -19,7 +19,7 @@
     kubeconfig_path: "/home/admin/kubeconfig.yml"
   tasks:
     - ansible.builtin.command:
-        cmd: ansible-galaxy install -r collections/requirements.yml
+        cmd: ansible-galaxy collection install -r collections/requirements.yml
     - name: Download and extract helm
       ansible.builtin.unarchive:
         src: "https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz"

@@ -41,7 +41,7 @@
   gather_facts: false
   tasks:
     - ansible.builtin.command: 
-        cmd: ansible-galaxy install -r collections/requirements.yml
+        cmd: ansible-galaxy collection install -r collections/requirements.yml
   tags: 
     - install_requirements
 

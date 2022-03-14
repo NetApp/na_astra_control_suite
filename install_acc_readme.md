@@ -1,7 +1,7 @@
 Install Astra Control Center
 =====
 
-Pre-requisites for Astra Control Center Installation
+Pre-requisites
 ------------
 
 1. Ansible with version 2.9 and above.
@@ -15,7 +15,7 @@ Pre-requisites for Astra Control Center Installation
 
 5. A private registry with read/write access.
 
-Requirements for Astra Control Center Installation
+Requirements
 -----------
 
 1. Download the Astra Control Center installer tarball from NetApp Support Site [here](https://mysupport.netapp.com/site/products/all/details/astra-control-center/downloads-tab).
@@ -23,13 +23,13 @@ Requirements for Astra Control Center Installation
 2. A kubeconfig file with admin access of the Kubernetes/OpenShift cluster on which Astra Control Center is planned to be installed on.
 
 
-Variables for Astra Control Center Installation
+Variables
 ---------
 
 Refer the vars/install_acc_vars.yml for information on variables.
 
 
-Procedure for Astra Control Center Installation
+Procedure
 --------
 
 1. Clone the repository - `git clone https://github.com/NetApp-Automation/na_astra_control_suite.git`

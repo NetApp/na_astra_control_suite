@@ -13,7 +13,7 @@ Note that there are certain restrictions around producing and/or sharing any der
 Workflows
 --------
 
-- To install Astra Control Center on a Kubernetes/OpenShift platform, follow the guidelines laid out [here](acc_install_readme.md)
+- To install Astra Control Center on a Kubernetes/OpenShift platform, follow the guidelines laid out [here](install_acc_readme.md)
 - To clone an application using Astra Control Center, follow the procedure as described in this [link](clone_app_readme.md)
 
 Author Information

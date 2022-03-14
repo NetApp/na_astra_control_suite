@@ -1,7 +1,7 @@
 Clone an application using Astra Control
 =====
 
-Pre-requisites for cloning an application
+Pre-requisites
 ------------
 
 1. Ansible with version 2.9 and above.

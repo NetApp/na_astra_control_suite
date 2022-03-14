@@ -1,3 +1,6 @@
+Clone an application using Astra Control
+=====
+
 Pre-requisites for cloning an application
 ------------
 

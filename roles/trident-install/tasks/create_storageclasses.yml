@@ -1,0 +1,10 @@
+- name: Create StorageClass using Trident Backend
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ inner_item }}"
+    kubeconfig: "{{ kubeconfig_path }}"
+  with_items: "{{ storageclass_defintions }}"
+  when: create_backends|bool
+  loop_control:
+    loop_var: inner_item
+

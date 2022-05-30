@@ -1,0 +1,17 @@
+- name: Create clusters in ACC
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/topology/v1/clouds/{{ pvt_cloud_id }}/clusters"
+    method: POST
+    validate_certs: false
+    headers:
+      accept: "*/*"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+      Content-Type: "application/astra-cluster+json"
+    status_code: 201
+    body_format: json
+    body:
+      credentialID: "{{ cred_var.json.id }}"
+      name: "{{ item_clustername }}"
+      type: "application/astra-cluster"
+      version: "1.1"
+  register: cluster_var

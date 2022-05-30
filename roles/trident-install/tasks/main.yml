@@ -1,0 +1,16 @@
+- name: Set up the environment
+  include_tasks: env_setup.yml
+
+- name: Create Trident namespace
+  include_tasks: create_trident_namespace.yml
+
+- name: Create secrets and install Trident
+  include_tasks: install_trident.yml
+
+- name: Create Trident Backends
+  include_tasks: create_trident_backends.yml
+  when: create_backends|bool
+
+- name: Create StorageClasses with Trident Backends
+  include_tasks: create_storageclasses.yml
+  when: create_backends|bool

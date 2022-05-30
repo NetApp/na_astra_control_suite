@@ -1,0 +1,50 @@
+- name: Create string of username & password
+  set_fact:
+    userpass: "{{ dockerhub_username }}:{{ dockerhub_password }}"
+
+- name: Create a base64 encoded string of username and password
+  set_fact:
+    reg_auth: "{{ userpass | b64encode }}"
+
+- vars:
+    vardockerconfig:
+      "auths":
+        docker.io:
+          "username": "{{ dockerhub_username }}"
+          "password": "{{ dockerhub_password }}"
+          "auth": "{{ reg_auth }}"
+  name: Create the docker config
+  set_fact:
+    dockerconfig: "{{ vardockerconfig | to_json }}"
+
+- name: Create the docker config
+  set_fact:
+    dockerconfig_encoded: "{{ dockerconfig | regex_replace(\"'\", '\"') | replace(\" \", \"\") | b64encode }}"
+
+- name: Create secret for Trident with Dockerhub creds
+  kubernetes.core.k8s:
+    state: present
+    resource_definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: trident-dockerhub
+        namespace: "{{ trident_namespace }}"
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: "{{ dockerconfig_encoded }}"
+    kubeconfig: "{{ kubeconfig_path }}"
+
+- name: Install Astra Trident using helm
+  kubernetes.core.helm:
+    release_name: "{{ helm_release_name }}"
+    chart_ref: "netapp-trident/trident-operator"
+    update_repo_cache: true
+    wait: true
+    wait_timeout: 150s
+    release_namespace: "{{ trident_namespace }}"
+    kubeconfig: "{{ kubeconfig_path }}"
+    create_namespace: no
+    values_files:
+      - values.yml
+

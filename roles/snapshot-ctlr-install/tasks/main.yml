@@ -1,0 +1,6 @@
+- name: Create Snapshot CRDs & Snapshot Controller 
+  include_tasks: create_crds_crs.yml
+
+- name: Create Snaphshot Class
+  include_tasks: create_snapshot_class.yml
+

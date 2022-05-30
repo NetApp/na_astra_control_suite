@@ -1,0 +1,12 @@
+astra_control_fqdn: astra-control-center.example.com
+astra_control_account_id: "xxxx-xxxx-xxxx-xxxx-xxxx"
+astra_control_api_token: "xxxxx"
+
+clone_details:
+  - clone_name: app-team-a
+    destination_namespace: app-team-a
+    source_cluster_name: src-cluster
+    destination_cluster_name: dest-cluster    
+    source_application_name: app-template
+    #source_backup_name: ""  #Use when you want to clone the application based on a previous backup. Uncomment and set the name of the backup
+    #source_snapshot_name: ""  #Use when you want to clone the application bsaed on a previous snapshot. Uncomment and set the name of the snapshot

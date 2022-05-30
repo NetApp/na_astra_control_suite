@@ -1,0 +1,15 @@
+- name: Get Cloud ID
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/topology/v1/clouds"
+    method: GET
+    validate_certs: false
+    headers:
+      accept: "*/*"
+      Authorization: "Bearer {{ astra_control_api_token }}"  
+  register: cloud_id
+
+- name: Set Private Cloud ID variable
+  set_fact:
+    pvt_cloud_id: "{{ cloud_id.json['items'].0.id }}"
+#- debug: var=pvt_cloud_id
+

@@ -1,0 +1,65 @@
+- block:
+  - name: Grab the list of images
+    find:
+      paths: "{{ installer_directory }}/{{ astra_tar_ball_name }}/images"
+      patterns: '*.tar'
+    register: astra_images_reg
+  - name: Set the list of images
+    set_fact:  
+      astra_image_files: "{{ astra_images_reg.files | map(attribute='path') | list | map('basename') }}"
+  - name: Set the image names and tags
+    vars:
+      astra_image_names: []
+      astra_image_tags: []
+    set_fact:
+      astra_image_names: "{{ astra_image_names + [item | regex_replace('(?P<name>[a-z0-9-]+)-(?P<tag>[v0-9].*).tar', '\\g<name>')] }}"
+      astra_image_tags: "{{ astra_image_tags + [item | regex_replace('(?P<name>[a-z0-9-]+)-(?P<tag>[v0-9].*).tar', '\\g<tag>')] }}"
+    with_items: "{{ astra_image_files }}"
+  - debug: 
+      msg: "{{ item.0 }}:{{ item.1 }}"
+    with_together:
+      - "{{ astra_image_names }}"
+      - "{{ astra_image_tags }}"  
+  - name: Load Astra images to local enginer
+    containers.podman.podman_load:
+      input: "{{ installer_directory }}/{{ astra_tar_ball_name }}/images/{{ item }}"
+    with_items: 
+      - "{{ astra_image_files }}"  
+  - name: Tag and push Astra images to registry
+    containers.podman.podman_image:
+      name: "{{ item.0 }}:{{ item.1 }}"
+      push: yes
+      username: "{{ astra_registry_username }}"
+      password: "{{ astra_registry_password }}"
+      pull: no
+      push_args:
+        dest: "{{ astra_registry_name }}/{{ astra_registry_namespace }}"
+      validate_certs: no
+    when: require_reg_creds|bool
+    with_together:
+      - "{{ astra_image_names }}"
+      - "{{ astra_image_tags }}"
+  - name: Tag and push Astra images to registry
+    containers.podman.podman_image:
+      name: "{{ item.0 }}:{{ item.1 }}"
+      push: yes
+      pull: no
+      push_args:
+        dest: "{{ astra_registry_name }}/{{ astra_registry_namespace }}"
+      validate_certs: no
+    when: not require_reg_creds|bool
+    with_together:
+      - "{{ astra_image_names }}"
+      - "{{ astra_image_tags }}"
+  rescue:
+    - name: Failure
+      fail:
+        msg:
+        - Loading and pushing images to registry failed.
+        - Possible troubleshooting steps - 
+        - 1. Check if the registry details and credentials are correct
+        - 2. Check if the registry is accessible
+        - 3. Check if podman container engine is installed on the Ansible controller 
+        - 4. Ensure there are no resources remaining from previous failed installs.
+        - 5. Check if variables defined adhere to the guidelines and are correct.
+

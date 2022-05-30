@@ -1,0 +1,42 @@
+#Override the tool versions if required
+#helm_version: 3.8.0
+#kubectl_version: 1.23.3
+
+#Override the default names of helm release and trident namespace
+#helm_release_name: trident
+#trident_namespace: trident
+
+#The complete path to the kubeconfig file for the cluster Trident is being installed on
+kubeconfig_path: "/home/admin/kubeconfig.yml"
+
+#Docker Hub Credentials
+dockerhub_username: xxxx
+dockerhub_password: xxxx
+
+#Specify whether or not backends and storageclasses are to be created
+create_backends: no
+
+#If create_backends is yes, then define the backend configuration for the backends to be created 
+trident_backend_configurations:
+  - backend_definition:
+      version: 1
+      backendName: trident
+      storageDriverName: ontap-nas 
+      managementLIF: x.x.x.x
+      dataLIF: x.x.x.x
+      svm: trident_svm
+    credentials:
+      username: admin
+      password: xxxx
+
+#If create_backends is yes, then define the configuration for the storageclasses to be created 
+storageclass_defintions:
+  - apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: trident
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+    provisioner: csi.trident.netapp.io
+    parameters:
+      backendType: "ontap-nas"

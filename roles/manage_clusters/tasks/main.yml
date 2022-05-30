@@ -1,0 +1,13 @@
+- name: Create and manage clusters in ACC
+  vars: 
+    item_path: "{{ item.0.path }}"
+    item_clustername: "{{ item.0.cluster_name }}"
+    files:
+    - create_creds.yml
+    - get_cloud_id.yml
+    - create_clusters.yml
+    - manage_clusters.yml
+  include_tasks: "{{ item.1 }}"
+  with_nested: 
+    - "{{ kubeconfig_files }}"
+    - "{{ files }}"

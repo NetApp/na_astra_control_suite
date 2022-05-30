@@ -1,0 +1,12 @@
+#Helm version
+helm_version: 3.8.0
+
+#Kubectl version
+kubectl_version: 1.23.3
+
+#Helm release name for Trident
+helm_release_name: trident
+
+#Namespace where Trident is to be installed
+trident_namespace: trident
+

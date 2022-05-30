@@ -1,0 +1,15 @@
+- hosts: localhost
+  gather_facts: false
+  name: Register and manage clusters in Astra Control Center
+  vars_files:
+    - vars/manage_clusters_vars.yml
+  pre_tasks:
+    - include_tasks: precheck_tasks/manage_clusters_prereqs.yml
+      vars:
+        kubeconfig_path: "{{ item.path }}"
+        loop_cluster_name: "{{ item.cluster_name }}"
+      with_items:
+        - "{{ kubeconfig_files }}"
+      when: check_and_install_trident|bool
+  roles:
+    - manage_clusters

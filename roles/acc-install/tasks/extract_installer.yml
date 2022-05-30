@@ -1,0 +1,15 @@
+- block:
+  - name: Extract the installer
+    unarchive: 
+      src: "{{ installer_directory }}/{{ astra_tar_ball_name }}.tar.gz"      
+      dest: "{{ installer_directory }}"
+      remote_src: yes
+  rescue:
+    - name: Failure
+      fail:
+        msg:
+        - Extracting the installer failed.
+        - Possible troubleshooting steps - 
+        - 1. Check if the Astra Control Center installer tar ball is present and accessible.
+        - 2. Check if variables defined adhere to the guidelines and are correct.
+

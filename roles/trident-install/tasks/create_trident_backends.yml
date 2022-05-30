@@ -1,0 +1,51 @@
+- name: Create Trident Backend Credential Secret
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: "backend-tbc-{{ inner_item.backend_definition.backendName }}-secret"
+        namespace: "{{ trident_namespace }}"
+      type: Opaque
+      stringData: "{{ inner_item.credentials }}"
+    kubeconfig: "{{ kubeconfig_path }}"
+  with_items: "{{ trident_backend_configurations }}"
+  when: create_backends|bool
+  loop_control:
+    loop_var: inner_item
+
+- name: Set the credentials secret name
+  vars:
+    backendscreds:
+      credentials:
+        name: "backend-tbc-{{ inner_item.backend_definition.backendName }}-secret"
+    tbc_backend_creds: []
+  set_fact:
+    tbc_backend_creds: "{{ tbc_backend_creds + [backendscreds] }}"
+  with_items: "{{ trident_backend_configurations }}"
+  when: create_backends|bool
+  loop_control:
+    loop_var: inner_item
+
+- name: Pause for trident pods to be up and running
+  pause:
+    minutes: 2
+
+- name: Create Trident Backends
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig_path }}"
+    definition:
+      apiVersion: trident.netapp.io/v1
+      kind: TridentBackendConfig
+      metadata:
+        name: "tbc-{{ inner_item.0.backend_definition.backendName }}"
+        namespace: "{{ trident_namespace }}"
+      spec: "{{ inner_item.0.backend_definition | combine(inner_item.1) }}"
+  with_together:
+    - "{{ trident_backend_configurations }}"
+    - "{{ tbc_backend_creds }}"
+  when: create_backends|bool
+  loop_control:
+    loop_var: inner_item

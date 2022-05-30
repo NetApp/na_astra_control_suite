@@ -1,0 +1,20 @@
+- name: Check Trident installation
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: TridentVersion
+    kubeconfig: "{{ kubeconfig_path }}"
+  register: check_trident
+
+- name: Display whether Trident CRDs are available
+  debug: var=check_trident.api_found
+
+- name: Set variable whether Trident is available on the cluster
+  set_fact:
+    trident_present: yes
+  when: check_trident.api_found|bool
+
+- name: Set variable whether Trident is available on the cluster
+  set_fact:
+    trident_present: no
+  when: not check_trident.api_found|bool
+

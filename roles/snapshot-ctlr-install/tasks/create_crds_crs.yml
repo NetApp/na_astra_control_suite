@@ -1,0 +1,25 @@
+- name: Download Snapshot CRDs
+  ansible.builtin.get_url:
+    url: "{{ inner_item }}"
+    dest: "files/{{ inner_item | basename }}"
+  with_items: "{{ snapshot_crds_crs_urls }}"
+  loop_control:
+    loop_var: inner_item
+
+- name: Install Snapshot Controller
+  kubernetes.core.k8s:
+    state: present
+    src: "files/{{ inner_item | basename }}"
+    kubeconfig: "{{ kubeconfig_path }}"
+  with_items: "{{ snapshot_crds_crs_urls }}"
+  loop_control:
+    loop_var: inner_item
+
+- name: Delete temporary files
+  ansible.builtin.file:
+    path: "files/{{ inner_item | basename }}"
+    state: absent
+  with_items: "{{ snapshot_crds_crs_urls }}"
+  loop_control:
+    loop_var: inner_item
+

@@ -1,0 +1,45 @@
+#Provide the Astra Control Center instance details and creds.
+astra_control_api_token: xxxxxxxxxxxxx
+astra_control_fqdn: astra-control-center-ui.example.com
+astra_control_account_id: xxxx-xxxx-xxxx-xxxx
+
+#Provide the list of cluster names and the complete path of kubeconfig files for the cluster to be managed by Astra Control Center.
+#Each kubeconfig file at this time should only have one context with associated cluster and user.
+kubeconfig_files:
+- cluster_name: cluster-01
+  path: /home/admin/cluster-01-kubeconfig
+
+#Specify whether or not the playbook should check for Trident installation and install if not available on the cluster.
+check_and_install_trident: yes
+
+#If check_and_install_trident is yes and Astra Trident is to be installed on the clusters, define the Trident configuration
+trident_configurations:
+- cluster_name: cluster-01
+  check_and_install_trident: yes
+  install_snapshot_controller: yes
+  trident_namespace: trident
+  dockerhub_username: xxx
+  dockerhub_password: xxx
+  create_backends: yes
+  #If create_backends is yes, then define the backend and the storageclass to be created with it
+  trident_backend_configurations:
+  - backend_definition:
+      version: 1
+      backendName: trident
+      storageDriverName: ontap-nas
+      managementLIF: x.x.x.x
+      dataLIF: x.x.x.x
+      svm: trident_svm
+    credentials:
+      username: admin
+      password: xxxx
+  storageclass_defintions:
+  - apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: trident
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+    provisioner: csi.trident.netapp.io
+    parameters:
+      backendType: "ontap-nas"

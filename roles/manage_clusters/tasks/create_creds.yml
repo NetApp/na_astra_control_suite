@@ -1,0 +1,40 @@
+- name: Generate kubeconfig json
+  shell: "python3 -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=None)' < {{ item_path }} > {{ item_path.split('.') | first }}.json"
+
+- name: Generate kubeconfig base64 code
+  shell: "cat {{ item_path.split('.') | first }}.json | base64 | tr -d '\n'"
+  register: b64_var
+
+#- debug: var=b64_var
+
+- name: Set the kubeconfig base64 code
+  set_fact: 
+    base64_kubeconfig: "{{ b64_var.stdout }}"
+
+- name: Create the kubeconfig credential  
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/core/v1/credentials"
+    method: POST
+    validate_certs: false
+    headers:
+      accept: "*/*"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+    status_code: 201
+    body_format: json
+    body:
+      keyStore: 
+        base64: "{{ base64_kubeconfig }}"
+      name: "{{ item_clustername }}"
+      type: "application/astra-credential"
+      version: "1.1"
+      keyType: kubeconfig
+      metadata:
+        labels:
+          - name: "astra.netapp.io/labels/read-only/credType"
+            value: "kubeconfig"
+          - name: "astra.netapp.io/labels/read-only/cloudName"
+            value: "private"
+  register: cred_var
+
+#- debug: var=cred_var
+#- debug: var=cred_var.json.id

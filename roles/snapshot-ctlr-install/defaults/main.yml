@@ -1,0 +1,12 @@
+#External snapshot controller release
+external_snapshotter_release: 4.0
+
+#URLs to download Snapshot CRDs and CRs
+snapshot_crds_crs_urls:
+  - https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-{{ external_snapshotter_release }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+  - https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-{{ external_snapshotter_release }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+  - https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-{{ external_snapshotter_release }}/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+  - https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-{{ external_snapshotter_release }}/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml
+  - https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-{{ external_snapshotter_release }}/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml
+
+

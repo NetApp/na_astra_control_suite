@@ -1,0 +1,31 @@
+- name: Manage clusters in ACC
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/topology/v1/managedClusters"
+    method: POST
+    validate_certs: false
+    headers:
+      accept: "*/*"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+    status_code: 201
+    body_format: json
+    body:
+      defaultStorageClass: "{{ cluster_var.json.defaultStorageClass }}"
+      id: "{{ cluster_var.json.id }}"
+      tridentManagedStateDesired: "managed"
+      type: "application/astra-managedCluster"
+      version: "1.1"
+  register: manage_cluster_var
+
+- name: Wait for the cluster to be managed
+  uri:
+    url: "https://{{ astra_control_fqdn }}/accounts/{{ astra_control_account_id }}/topology/v1/managedClusters/{{ manage_cluster_var.json.id }}"
+    method: GET
+    validate_certs: false
+    headers:
+      accept: "*/*"
+      Authorization: "Bearer {{ astra_control_api_token }}"
+  register: cluster_managed
+  until: cluster_managed.json.state == "running"
+  retries: 60
+  delay: 3
+

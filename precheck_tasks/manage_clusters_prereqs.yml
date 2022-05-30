@@ -1,0 +1,33 @@
+- name: Check if Trident is installed
+  include_role:
+    name: check_trident
+  when: check_and_install_trident|bool
+
+- name: Install Trident if not installed
+  vars:
+    trident_namespace: "{{ trident_item.trident_namespace | default('trident') }}"
+    dockerhub_username: "{{ trident_item.dockerhub_username | default(omit) }}"
+    dockerhub_password: "{{ trident_item.dockerhub_password | default(omit) }}"
+    create_backends: "{{ trident_item.create_backends | default('no') }}"
+    trident_backend_configurations: "{{ trident_item.trident_backend_configurations | default(omit) }}"
+    storageclass_defintions: "{{ trident_item.storageclass_defintions | default(omit) }}"
+    install_snapshot_controller: "{{ trident_item.install_snapshot_controller | default('no') }}"
+  include_role:
+    name: trident-install
+    apply:
+      become: yes
+  when: check_and_install_trident|bool and not trident_present|bool and loop_cluster_name == trident_item.cluster_name
+  with_items:
+    - "{{ trident_configurations }}"
+  loop_control:
+    loop_var: trident_item
+
+- name: Install snapshot controller and CRDs
+  include_role:
+    name: snapshot-ctlr-install
+  when: trident_configurations is defined and trident_configurations|length > 0 and snap_item.install_snapshot_controller|bool and loop_cluster_name == snap_item.cluster_name
+  with_items:
+    - "{{ trident_configurations }}"
+  loop_control:
+    loop_var: snap_item
+

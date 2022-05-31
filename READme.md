@@ -21,6 +21,6 @@ Workflows
 Author Information
 ------------------
 
-- Nikhil M Kulkarni - NetApp Solutions Automation Team
+NetApp Solutions Automation Team
 
 
